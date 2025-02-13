@@ -4619,20 +4619,42 @@ if (cc.internal.VideoPlayer) {
     constructor(componenet) {
       super(componenet);
       this._matViewProj_temp = new mat4();
+
+      this._alphaVideo = false;
+      /// 透明视频alpha通道位置（0: bottom, 1: right, 2: top, 3: left）
+      this._alphaLayoutPos = 2;
+
+      this._stayOnBottom = false;
     }
     syncClip(clip) {
-      this.removeVideoPlayer();
+      let video = this.video;
+      if (video) {
+         video.stop();
+         this.resetVideoState();
+      }
       if (!clip) {
         return;
       }
-      this.createVideoPlayer(clip._nativeAsset);
+      if (video) {
+        video.setURL(clip._nativeAsset);
+      } else {
+        this.createVideoPlayer(clip._nativeAsset);
+      }
     }
     syncURL(url) {
-      this.removeVideoPlayer();
+      let video = this.video;
+      if (video) {
+         video.stop();
+         this.resetVideoState();
+      }
       if (!url) {
         return;
       }
-      this.createVideoPlayer(url);
+      if (video) {
+         video.setURL(url);
+      } else {
+         this.createVideoPlayer(url);
+      }
     }
     onCanplay() {
       if (this._loaded) {
@@ -4668,6 +4690,13 @@ if (cc.internal.VideoPlayer) {
       this._video = new jsb.VideoPlayer();
       this._bindEvent();
       this._video.setVisible(this._visible);
+      this._video.setAlphaEnabled(this._alphaVideo);
+
+      if (this._alphaVideo) {
+          this._video.setAlphaLayoutPosition(this._alphaLayoutPos);
+      }
+
+      this._video.setStayOnBottom(this._stayOnBottom);
       this._video.setURL(url);
       this._forceUpdate = true;
     }
@@ -4677,13 +4706,17 @@ if (cc.internal.VideoPlayer) {
         video.stop();
         video.setVisible(false);
         video.destroy();
+        this.resetVideoState();
+        this._video = null;
+       }
+    }
+
+    resetVideoState() {
         this._playing = false;
         this._loaded = false;
         this._loadedMeta = false;
         this._ignorePause = false;
         this._cachedCurrentTime = 0;
-        this._video = null;
-      }
     }
     getDuration() {
       if (!this.video) {
@@ -4709,8 +4742,24 @@ if (cc.internal.VideoPlayer) {
         this.video.setLoop(enable);
       }
     }
-    syncStayOnBottom() {
-      cc.warn('The platform does not support');
+    syncStayOnBottom(enable = false) {
+      this._stayOnBottom = enable;
+      if (this.video) {
+         this.video.setStayOnBottom(enable);
+      }
+    }
+    syncAlphaEnable(enable = false) {
+      this._alphaVideo = enable;
+      if (this.video) {
+        this.video.setAlphaEnabled(enable);
+      }
+    }
+
+    syncAlphaLayoutPosition(layoutPos = 0) {
+      this._alphaLayoutPos = layoutPos;
+      if (this.video) {
+          this.video.setAlphaLayoutPosition(layoutPos);
+      }
     }
     getCurrentTime() {
       if (this.video) {

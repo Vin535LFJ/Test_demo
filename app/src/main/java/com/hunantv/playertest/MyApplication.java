@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import com.hunantv.imgo.BaseApplication;
 import com.hunantv.media.player.MgtvPlayerLogger;
 
 /**
@@ -25,6 +26,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        BaseApplication.setContext(this);
         initLog();
     }
 

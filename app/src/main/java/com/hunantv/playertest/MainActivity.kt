@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         if (mVideoHelper == null) {
             mVideoHelper = CocosVideoHelper(this, rootLayout)
 
-            mVideoHelper?.setVideoPlayerView(MgtvVideoPlayerView(this , 0))
+            mVideoHelper?.setVideoPlayerView(MgtvCocosPlayerView(this , 0, true))
         }
 
         CocosPlayer.getInstance().loadEngine(this, applicationContext)
